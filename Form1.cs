@@ -14,6 +14,8 @@ using Google.Apis.Customsearch.v1;
 using System.Web.Script.Serialization;
 using System.Collections;
 using Newtonsoft.Json;
+using Microsoft.Office.Interop.PowerPoint;
+using Microsoft.Office.Core;
 
 namespace PowerpointImageForm
 {
@@ -25,6 +27,8 @@ namespace PowerpointImageForm
         public List<Picture> chosenPictures = new List<Picture>();
 
         public string boldWords = "";
+        public string slideTitle = "";
+        public string slideText = "";
 
         public Form1()
         {
@@ -35,6 +39,9 @@ namespace PowerpointImageForm
         //from the inputted title and bold words in the text box.
         private void button1_Click(object sender, EventArgs e)
         {
+            slideTitle = textBox1.Text;
+            slideText = richTextBox1.Text;
+
             //Include Title and bold words
             string words = textBox1.Text + boldWords;
             string query = words.Replace(" ", "+");
@@ -124,15 +131,9 @@ namespace PowerpointImageForm
             return pictureList;
         }
 
-        public void ChooseImages (List<Picture> pictures)
+        public void ChooseImages(List<Picture> pictures)
         {
             chosenPictures = pictures;
-        }
-
-        public void SavePowerpoint(List<Picture> pictures)
-        {
-
-
         }
 
         //This button allows the user to format the text entered.
@@ -149,5 +150,51 @@ namespace PowerpointImageForm
                 }
             }
         }
+
+        //This button generates the Powerpoint slide from the inputted text and images.
+        private void button3_Click(object sender, EventArgs e)
+        {
+                //Modified from https://stackoverflow.com/questions/26372020/how-to-programmatically-create-a-powerpoint-from-a-list-of-images
+
+                string pictureFileName = "C:\\temp\\test.jpg";
+
+                var pptApplication = new Microsoft.Office.Interop.PowerPoint.Application();
+
+                Microsoft.Office.Interop.PowerPoint.Slides slides;
+                Microsoft.Office.Interop.PowerPoint._Slide slide;
+                Microsoft.Office.Interop.PowerPoint.TextRange objText;
+
+                // Create the Presentation File
+                Presentation pptPresentation = pptApplication.Presentations.Add(MsoTriState.msoTrue);
+
+                Microsoft.Office.Interop.PowerPoint.CustomLayout customLayout = pptPresentation.SlideMaster.CustomLayouts[Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutText];
+
+                // Create new Slide
+                slides = pptPresentation.Slides;
+                slide = slides.AddSlide(1, customLayout);
+
+                // Add title
+                objText = slide.Shapes[1].TextFrame.TextRange;
+                objText.Text = slideTitle;
+                objText.Font.Name = "Arial";
+                objText.Font.Size = 32;
+
+                objText = slide.Shapes[2].TextFrame.TextRange;
+                objText.Text = slideText;
+
+                if (chosenPictures != null)
+                {
+                    foreach (Picture picture in chosenPictures)
+                    {
+                        Microsoft.Office.Interop.PowerPoint.Shape shape = slide.Shapes[2];
+                        slide.Shapes.AddPicture(pictureFileName, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoTrue, shape.Left, shape.Top, shape.Width, shape.Height);
+                    }
+                }
+
+                pptPresentation.SaveAs(@"c:\temp\test.pptx", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                //pptPresentation.Close();
+                //pptApplication.Quit();
+            }
+        
     }
 }
