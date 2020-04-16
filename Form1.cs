@@ -143,8 +143,8 @@ namespace PowerpointImageForm
             FontDialog fd = new FontDialog();
             if (fd.ShowDialog() == DialogResult.OK)
             {
-                richTextBox1.Font = fd.Font;
-                if (richTextBox1.Font.Bold)
+                richTextBox1.SelectionFont = fd.Font;   //SelectionFont allows the selected text to be formatted.
+                if (richTextBox1.SelectionFont.Bold)
                 {
                     boldWords += " " + richTextBox1.SelectedText;
                 }
@@ -195,6 +195,20 @@ namespace PowerpointImageForm
                 //pptPresentation.Close();
                 //pptApplication.Quit();
             }
-        
+
+        //This button clears the current search parameters to start over.
+        private void button4_Click(object sender, EventArgs e)
+        {
+            boldWords = "";
+            slideText = "";
+            slideTitle = "";
+
+            textBox1.Clear();
+            richTextBox1.Clear();
+
+            imageLinks.Clear();
+            pictureList.Clear();
+            chosenPictures.Clear();
+        }
     }
 }
