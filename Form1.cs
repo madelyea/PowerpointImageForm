@@ -42,6 +42,12 @@ namespace PowerpointImageForm
             slideTitle = textBox1.Text;
             slideText = richTextBox1.Text;
 
+            if (slideTitle == "")
+            {
+                MessageBox.Show("Please enter a title to generate images.");
+                return;
+            }
+
             //Include Title and bold words
             string words = textBox1.Text + boldWords;
             string query = words.Replace(" ", "+");
@@ -196,7 +202,7 @@ namespace PowerpointImageForm
                 //pptApplication.Quit();
             }
 
-        //This button clears the current search parameters to start over.
+        //This button clears the current search parameters and saved images to start over.
         private void button4_Click(object sender, EventArgs e)
         {
             boldWords = "";
